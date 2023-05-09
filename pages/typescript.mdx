@@ -1,0 +1,634 @@
+# Introduction to Typescript
+
+Typescript is a superset of Javascript. All javascript is valid in
+typescript. Key features to know about typescript
+
+        - Typescript adds additional syntax to JS to give support for type-safety in editor. It will also help find bugs 15% faster than traditional JS way.
+        - Typescript is a compiled language. It converts to JS and can be run anywhere JS can run.
+        - Typescript can provide safety for scale. It understands JS and uses type inference to give you great tooling
+        - Provides readability as it helps show what the code is supposed to do.
+        - Learning TS gives you a better understanding and knowledge of js
+        - Only issue is it takes a little longer to write Typescript and when creating smaller projects, it seems to be unnecessary.
+
+## Types in Typescript
+
+There are 7 primitive data types, and not to be confused with primitive values.
+
+-   string
+-   number
+-   bigint
+-   boolean
+-   undefined
+-   null
+-   symbol
+
+## Type Annotation/Type Signature
+
+By adding `:` type after declaring the variable, we can set a type
+
+    ```ts
+    let id: number = 5;
+    let firstname: string = "danny";
+    let hasDog: boolean = true;
+
+    let unit: number; // Declare variable without assigning a value
+    unit = 5;
+    ```
+
+## Union type
+
+Union can allow assigning multiple types to a variable.
+
+```ts
+let age: string | number;
+age = 26;
+age = "26";
+```
+
+## Reference types
+
+In JS, almost everything is an object. String, numbers, booleans etc, can all be object when defined with the `new` keyword
+
+```ts
+let fname = new String("Danny");
+console.log(fname); // String {'Danny'}
+```
+
+### Quick difference between Primative and Reference types
+
+If we have two variables, x and y, and they both contain primitive data, then they are completely independent of each other:
+
+```ts
+let x = 2;
+let y = 1;
+
+x = y;
+y = 100;
+console.log(x); // 1 (even though y changed to 100, x is still 1)
+
+// BUT
+let point1 = { x: 1, y: 1 };
+let point2 = point1;
+
+point1.y = 100;
+console.log(point2.y); // 100 (point1 and point2 refer to the same memory address where the point object is stored)
+```
+
+## Array Types
+
+Arrays can be defined with the `[]` after the type declaration.
+
+````ts
+let ids: number[] = [1, 2, 3, 4, 5]; // can only contain numbers
+let names: string[] = ["Danny", "Anna", "Bazza"]; // can only contain strings
+let options: boolean[] = [true, false, false]; // can only contain true or false
+let books: object[] = [
+    { name: "Fooled by randomness", author: "Nassim Taleb" },
+    { name: "Sapiens", author: "Yuval Noah Harari" },
+]; // can only contain objects
+let arr: any[] = ["hello", 1, true]; // any basically reverts TypeScript back into JavaScript
+
+ids.push(6);
+// ids.push("7"); // ERROR: Argument of type 'string' is not assignable to parameter of type 'number'.```
+
+### Unions of different types are possible
+```ts
+let person: (string | number | boolean)[] = ["Danny", 1, true];
+person[0] = 100;
+// person[1] = { name: "Danny" }; // Error - person array can't contain objects
+````
+
+Initializing array with values, it is not necessary to explicitly state the type.
+
+```ts
+let person = ["Danny", 1, true]; // This is identical to above example
+person[0] = 100;
+// person[1] = { name: 'Danny' }; // Error - person array can't contain objects
+```
+
+Tuples are special arrays - array with fixed size and data types.
+
+```ts
+let person: [string, number, boolean] = ["Danny", 1, true];
+person[0] = 100; // Error - Value at index 0 can only be a string
+```
+
+## Objects
+
+Objects in TS must have all correct properties and value types
+
+```ts
+// Declare a variable called person with a specific object type annotation
+let person: {
+    name: string;
+    location: string;
+    isProgrammer: boolean;
+};
+
+// Assign person to an object with all the necessary properties and value types
+person = {
+    name: "Danny",
+    location: "UK",
+    isProgrammer: true,
+};
+
+person.isProgrammer = "Yes"; // ERROR: should be a boolean
+
+person = {
+    name: "John",
+    location: "US",
+};
+// ERROR: missing the isProgrammer property
+```
+
+### Interface
+
+Defining the signature of an object, you will most likely use an `interface`
+
+```ts
+interface Person {
+    name: string;
+    location: string;
+    isProgrammer: boolean;
+}
+
+let person1: Person = {
+    name: "Danny",
+    location: "UK",
+    isProgrammer: true,
+};
+
+let person2: Person = {
+    name: "Sarah",
+    location: "Germany",
+    isProgrammer: false,
+};
+```
+
+Function properties can be declared with function signatures.
+
+```ts
+interface Speech {
+    sayHi(name: string): string; //common JS
+    sayBye: (name: string) => string; //ES6 Arrow Functions
+}
+
+let sayStuff: Speech = {
+    sayHi: function (name: string) {
+        return `Hi ${name}`;
+    },
+    sayBye: (name: string) => `Bye ${name}`,
+};
+
+console.log(sayStuff.sayHi("Heisenberg")); // Hi Heisenberg
+console.log(sayStuff.sayBye("Heisenberg")); // Bye Heisenberg
+```
+
+## Functions
+
+Function arguments types can be set as well as the return of the function.
+
+```ts
+// Define a function called circle that takes a diam variable of type number, and returns a string
+function circle(diam: number): string {
+    return "The circumference is " + Math.PI * diam;
+}
+
+console.log(circle(10)); // The circumference is 31.41592653589793
+```
+
+Same function in ES6 syntax
+
+```ts
+const circle = (diam: number): string => {
+    return "The circumference is " + Math.PI * diam;
+};
+
+console.log(circle(10)); // The circumference is 31.41592653589793
+```
+
+Note that it isn't necessary to explicitly state the type of the circle function. Typescript infers the type as well as the return. However, it is common to explicitly state the return type for clarity on larger projects.
+
+```ts
+// Using explicit typing
+const circle: Function = (diam: number): string => {
+    return "The circumference is " + Math.PI * diam;
+};
+
+// Inferred typing - TypeScript sees that circle is a function that always returns a string, so no need to explicitly state it
+const circle = (diam: number) => {
+    return "The circumference is " + Math.PI * diam;
+};
+```
+
+### Optional arguments
+
+In Typescript, we can have optional arguments in for functions
+
+```ts
+const add = (a: number, b: number, c?: number | string) => {
+    console.log(c);
+
+    return a + b;
+};
+
+console.log(add(5, 4, "I could pass a number, string, or nothing here!"));
+// I could pass a number, string, or nothing here!
+// 9
+```
+
+Any function with a return type of void does not need to be explicitly stated and TS will infer it.
+
+If you want to declare a function variable and not define it just yet, you must use a function signature.
+
+```ts
+// Declare the variable sayHello, and give it a function signature that takes a string and returns nothing.
+let sayHello: (name: string) => void;
+
+// Define the function, satisfying its signature
+sayHello = (name) => {
+    console.log("Hello " + name);
+};
+
+sayHello("Danny"); // Hello Danny
+```
+
+## Any - The Dynamic Type
+
+Typescript has a catch all type which basically reverts the code back to Javascript. Setting type `any` type, allows all the variables, arrays, functions, objects, etc to be redefined to any type. It's important to avoid the any type as much as possible. It also defeats the purpose of Typescript.
+
+```ts
+let age: any = "100";
+age = 100;
+age = {
+    years: 100,
+    months: 2,
+};
+```
+
+## Type Aliases
+
+Very important as it acts as a single source of truth throughout the entire project. Type Aliases reduce code duplication.
+
+```ts
+type StringOrNumber = string | number;
+
+type PersonObject = {
+    name: string;
+    id: StringOrNumber;
+};
+
+const person1: PersonObject = {
+    name: "John",
+    id: 1,
+};
+
+const person2: PersonObject = {
+    name: "Delia",
+    id: 2,
+};
+
+const sayHello = (person: PersonObject) => {
+    return "Hi " + person.name;
+};
+
+const sayGoodbye = (person: PersonObject) => {
+    return "Seeya " + person.name;
+};
+```
+
+## The DOM, DOM Types and Type Casting
+
+Typescript cannot access the DOM like Javascript. So the code below in commonJS says grab href of an anchor tag in the DOM and console log it. However, if an anchor tag doesn't not exists then it will throw an error during page load. Typescript will see this before hand and prevent compiling unless it has been addressed.
+
+```ts
+const link = document.querySelector("a");
+console.log(link.href); // ERROR: Object is possibly 'null'. TypeScript can't be sure the anchor tag exists, as it can't access the DOM
+```
+
+### Non-null assertion operator
+
+To fix this we use the non-null assertion operator `!`. We can tell the compiler explicitly that the express has a value other than null or undefined
+
+```ts
+const link = document.querySelector("a")!;
+console.log(link.href); // https://jkdelara.com
+```
+
+### DOM Types & Type Casting
+
+Because we explicitly are looking for an anchor tag, Typescript can infer it's typing. If we select a DOM element by ID or class, it will not infer it's typing.
+
+```ts
+const form = document.getElementById("signup-form");
+
+console.log(form.method);
+// ERROR: Object is possibly 'null'.
+// ERROR: Property 'method' does not exist on type 'HTMLElement'.
+```
+
+Example above we get two errors, to fix this we **type cast** the form variable to `HTMLFormElement`
+
+```ts
+const form = document.getElementById("signup-form") as HTMLFormElement;
+console.log(form.method); // post
+```
+
+Typescript has an Event object built in and if we add a submit an event listener to the form, we will get an error if we call any methods that aren't part of the Event Object.
+
+```ts
+const form = document.getElementById("signup-form") as HTMLFormElement;
+
+form.addEventListener("submit", (e: Event) => {
+    e.preventDefault(); // prevents the page from refreshing
+
+    console.log(e.tarrget); // ERROR: Property 'tarrget' does not exist on type 'Event'. Did you mean 'target'?
+});
+```
+
+## Classes
+
+Similar to classes in JS and any other language but we can declare types for their properties.
+
+````ts
+class Person {
+    name: string;
+    isCool: boolean;
+    pets: number;
+
+    constructor(n: string, c: boolean, p: number) {
+        this.name = n;
+        this.isCool = c;
+        this.pets = p;
+    }
+
+    sayHello() {
+        return `Hi, my name is ${this.name} and I have ${this.pets} pets`;
+    }
+}
+
+const person1 = new Person("Danny", false, 1);
+const person2 = new Person("Sarah", "yes", 6); // ERROR: Argument of type 'string' is not assignable to parameter of type 'boolean'.
+
+console.log(person1.sayHello()); // Hi, my name is Danny and I have 1 pets```
+````
+
+We can then create a people array of type Person from the example above.
+
+```ts
+let people: Person[] = [person1, person2];
+```
+
+We can add access modifiers to the properties of the class as well. Typescript offers a new access modifier `readonly`
+
+```ts
+class Person {
+    readonly name: string; // This property is immutable - it can only be read
+    private isCool: boolean; // Can only access or modify from methods within this class
+    protected email: string; // Can access or modify from this class and subclasses
+    public pets: number; // Can access or modify from anywhere - including outside the class
+
+    constructor(n: string, c: boolean, e: string, p: number) {
+        this.name = n;
+        this.isCool = c;
+        this.email = e;
+        this.pets = p;
+    }
+
+    sayMyName() {
+        console.log(`Your not Heisenberg, you're ${this.name}`);
+    }
+}
+
+const person1 = new Person("Danny", false, "dan@e.com", 1);
+console.log(person1.name); // Fine
+person1.name = "James"; // Error: read only
+console.log(person1.isCool); // Error: private property - only accessible within Person class
+console.log(person1.email); // Error: protected property - only accessible within Person class and its subclasses
+console.log(person1.pets); // Public property - so no problem
+```
+
+Classes can be more concise and the properties can be written in the constructor
+
+```ts
+class Person {
+    constructor(
+        readonly name: string,
+        private isCool: boolean,
+        protected email: string,
+        public pets: number
+    ) {}
+
+    sayMyName() {
+        console.log(`Your not Heisenberg, you're ${this.name}`);
+    }
+}
+
+const person1 = new Person("Danny", false, "dan@e.com", 1);
+console.log(person1.name); // Danny
+```
+
+### Extend Classes
+
+Classes can be extended just like JS
+
+```ts
+class Programmer extends Person {
+    programmingLanguages: string[];
+
+    constructor(
+        name: string,
+        isCool: boolean,
+        email: string,
+        pets: number,
+        pL: string[]
+    ) {
+        // The super call must supply all parameters for base (Person) class, as the constructor is not inherited.
+        super(name, isCool, email, pets);
+        this.programmingLanguages = pL;
+    }
+}
+```
+
+[Refer to the Typescript doc for more info about classes](https://www.typescriptlang.org/docs/handbook/2/classes.html)
+
+## Modules
+
+In JavaScript, a module is just a file containing related code. Functionality can be imported and exported between modules, keeping the code well organized.
+
+TypeScript also supports modules. The TypeScript files will compile down into multiple JavaScript files.
+
+In the `tsconfig.json` file, change the following options to support modern importing and exporting:
+
+```json
+{
+    "target": "es2016",
+    "module": "es2015"
+}
+```
+
+(Although, for Node projects you very likely want "module": "CommonJS" – Node doesn't yet support modern importing/exporting.)
+Now we can import the script in html with the type module to make use of ES6 imports and exports
+
+```
+// src/hello.ts
+export function sayHi() {
+  console.log('Hello there!');
+}
+
+// src/script.ts
+import { sayHi } from './hello.js';
+
+sayHi(); // Hello there!
+// Note: always import as a JavaScript file, even in TypeScript files.
+```
+
+## Interfaces
+
+To define objects you use the `interface` keyword. This defines how an object should look like.
+
+```ts
+interface Person {
+    name: string;
+    age: number;
+}
+
+function sayHi(person: Person) {
+    console.log(`Hi ${person.name}`);
+}
+
+sayHi({
+    name: "John",
+    age: 48,
+}); // Hi John
+```
+
+You can also define an object with the `type` alias
+
+```ts
+type Person = {
+    name: string;
+    age: number;
+};
+
+function sayHi(person: Person) {
+    console.log(`Hi ${person.name}`);
+}
+
+sayHi({
+    name: "John",
+    age: 48,
+}); // Hi John
+```
+
+Or it can be defined anonymously:
+
+```ts
+function sayHi(person: { name: string; age: number }) {
+    console.log(`Hi ${person.name}`);
+}
+
+sayHi({
+    name: "John",
+    age: 48,
+}); // Hi John
+```
+
+### Extending
+
+Extending an interface:
+
+```ts
+interface Animal {
+    name: string;
+}
+
+interface Bear extends Animal {
+    honey: boolean;
+}
+
+const bear: Bear = {
+    name: "Winnie",
+    honey: true,
+};
+```
+
+Extending a type via intersections:
+
+```ts
+type Animal = {
+    name: string;
+};
+
+type Bear = Animal & {
+    honey: boolean;
+};
+
+const bear: Bear = {
+    name: "Winnie",
+    honey: true,
+};
+```
+
+#### Type vs Interface
+
+`Interfaces` are very similar to `type` aliases, and in many cases you can use either. The key distinction is that `type` aliases cannot be reopened to add new properties, vs an `interface` which is always extendable.
+
+##### Adding new fields to an existing interface vs type
+
+```ts
+interface Animal {
+    name: string;
+}
+
+// Re-opening the Animal interface to add a new field
+interface Animal {
+    tail: boolean;
+}
+
+const dog: Animal = {
+    name: "Bruce",
+    tail: true,
+};
+```
+
+##### Types cannot be changed after being initialized
+
+```ts
+type Animal = {
+    name: string;
+};
+
+type Animal = {
+    tail: boolean;
+};
+// ERROR: Duplicate identifier 'Animal'.
+```
+
+### Typescript Recommendation
+
+Typescript docs recommends the use of Interfaces to define objects until you need to use the features of a type.
+
+Interfaces can also define function signatures:
+
+```ts
+interface Person {
+    name: string;
+    age: number;
+    speak(sentence: string): void;
+}
+
+const person1: Person = {
+    name: "John",
+    age: 48,
+    speak: (sentence) => console.log(sentence),
+};
+```
+
+### Why use Interfaces instead of a class
+
+One advantage of using an interface is that it is only used by TypeScript, not JavaScript. This means that it won't get compiled and add bloat to your JavaScript. Classes are features of JavaScript, so it would get compiled.
+
+Also, a class is essentially an object factory (that is, a blueprint of what an object is supposed to look like and then implemented), whereas an interface is a structure used solely for type-checking.
+
+While a class may have initialized properties and methods to help create objects, an interface essentially defines the properties and type an object can have.
